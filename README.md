@@ -37,28 +37,65 @@ requirements.txt
 
 ## Cara menjalankan
 
+### 1. Setup environment
+
+Disarankan pakai virtual environment supaya dependensi tidak bentrok dengan package Python lain di komputer kamu.
+
+**macOS / Linux:**
 ```bash
-python -m pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-# 1. Eksplorasi data
-jupyter nbconvert --to notebook --execute --inplace notebooks/01_eda.ipynb
+**Windows (PowerShell):**
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-# 2. Preprocessing, feature engineering, training, validasi, & generate prediksi final
-#    (notebook ini yang menghasilkan validation_predictions.csv dan mengisi
-#     kolom predicted_rate di data/december_chart_inputs.csv)
-jupyter nbconvert --to notebook --execute --inplace notebooks/02_modeling.ipynb
+`requirements.txt` sudah termasuk `jupyter` & `ipykernel`, jadi tidak perlu instalasi tambahan untuk membuka notebook.
 
-# 3. Validasi format resmi + generate chart Desember
+### 2. Jalankan notebook
+
+Buka Jupyter dari dalam virtual environment yang sudah dibuat:
+
+```bash
+jupyter notebook
+```
+
+(atau `jupyter lab`, atau buka folder ini langsung lewat VS Code / PyCharm dan pilih interpreter dari `.venv` sebagai kernel-nya)
+
+Lalu jalankan berurutan, **dari atas ke bawah** (menu **Run > Run All Cells**, atau tombol ⏩ *"Restart Kernel and Run All"*):
+
+1. **`notebooks/01_eda.ipynb`** — eksplorasi data, tidak menghasilkan file output, murni analisis.
+2. **`notebooks/02_modeling.ipynb`** — cleaning, feature engineering, training, evaluasi. Notebook ini otomatis menghasilkan:
+   - `validation_predictions.csv` (di root folder)
+   - `data/december_chart_inputs.csv` yang sudah terisi kolom `predicted_rate`
+   - Notebook ini juga langsung menjalankan `score.py` di sel terakhir dan menampilkan chart `scorer_results/candidate_december.png` inline.
+
+Tidak perlu menjalankan apa pun lewat terminal untuk notebook-nya — cukup buka file-nya dan klik "Run All", semua sel (termasuk instalasi kecil, loading data, training, sampai generate file output) akan berjalan otomatis sesuai urutan.
+
+### 3. (Opsional) Validasi ulang lewat terminal
+
+Kalau ingin mengecek ulang file output tanpa membuka notebook lagi (misalnya setelah `02_modeling.ipynb` selesai dijalankan sekali):
+
+```bash
 python score.py --predictions validation_predictions.csv --december-predictions data/december_chart_inputs.csv
 ```
 
-Output `score.py` yang diharapkan:
+Output yang diharapkan:
 ```
 Validated 12,000 final predictions.
 Validated 31 fixed December predictions.
 Created chart: scorer_results/candidate_december.png
 Final validation metrics are calculated by Spotter after submission.
 ```
+
+> Catatan: `validation_predictions.csv` dan `data/december_chart_inputs.csv` (kolom `predicted_rate`) di repo ini **sudah** merupakan hasil run notebook sebelumnya, jadi langkah 3 ini bisa langsung dijalankan tanpa perlu re-run notebook dulu kalau hanya mau memverifikasi format & melihat chart-nya.
 
 ## Ringkasan pendekatan
 
